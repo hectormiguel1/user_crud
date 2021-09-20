@@ -243,10 +243,25 @@ Future<void> addUserComments() async {
   }
 }
 
+Future<void> addPlanetGroups() async {
+  List<String> groupsToAdd = [];
+  records.forEach((element) => groupsToAdd.contains(element.planet)
+      ? null
+      : groupsToAdd.add(element.planet));
+  for (var index = 0; index < groupsToAdd.length; index++) {
+    var result = await addGroup(groupName: groupsToAdd[index]);
+    result.exitCode == 0
+        ? print(
+            '[${index + 1}/${groupsToAdd.length}] Added Group: ${groupsToAdd[index]} Successfully!')
+        : print(
+            '[${index + 1}/${groupsToAdd.length}] Error Adding Group: ${groupsToAdd[index]}. Error: ${result.stderr}');
+  }
+}
+
 Future<void> addUsersToGroups() async {
+  await addPlanetGroups();
   List<PASSWDRecord> passwdRecords = await parsePasswd();
   print('Loaded ${passwdRecords.length} records from /etc/passwd');
-
   passwdRecords.removeWhere((record) => record.uid >= 2000);
   print(
       'Remaining Records after Removing those with UID >= 2000: ${passwdRecords.length}');
